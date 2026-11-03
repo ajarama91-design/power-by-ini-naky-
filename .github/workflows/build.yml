@@ -8,14 +8,15 @@ on:
       - main
 
 jobs:
-  build:
+  android:
+    name: Compile Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Install Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -24,22 +25,23 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install SDK components
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses || true
 
-      - name: Setup Gradle
+      - name: Install SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Install Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build APK
+      - name: Compile APK
         run: gradle assembleDebug
 
-      - name: Upload APK
+      - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: POWER-BY-INI-NAKY-APK
           path: app/build/outputs/apk/debug/app-debug.apk
-defaults:
+
